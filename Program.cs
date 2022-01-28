@@ -16,7 +16,7 @@ namespace Daily_MTM_Report_Task_1
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new Daily_MTM_Report());
         }
     }
 }
