@@ -13,8 +13,20 @@ namespace Daily_MTM_Report_Task_1
     {
         public static string JSE_URL;
 
-        public static List<string> ExcelLinks2022;
-
-        public static List<string> ExcelLinks2021;
+        public static string ResourcesLink;
+        public static void CreateORCheckLocalFolders() 
+        {
+            string Excel2022FolderPath = @"C:\Daily_MTM_Report_Sheets_2022";
+            if (!Directory.Exists(Excel2022FolderPath)) 
+            {
+                Directory.CreateDirectory(Excel2022FolderPath);
+            }
+            string Excel2021FolderPath = @"C:\Daily_MTM_Report_Sheets_2021";
+            if (!Directory.Exists(Excel2021FolderPath)) 
+            {
+                Directory.CreateDirectory(Excel2021FolderPath);
+            }
+            
+        }
     }
 }

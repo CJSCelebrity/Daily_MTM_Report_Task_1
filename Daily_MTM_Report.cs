@@ -1,69 +1,109 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Windows.Forms;
 using HtmlAgilityPack;
+using System.IO;
+using System.Net;
+using System.Threading;
 
 namespace Daily_MTM_Report_Task_1
 {
     public partial class Daily_MTM_Report : Form
     {
+        public static CancellationTokenSource cancellationToken = new CancellationTokenSource();
         public Daily_MTM_Report()
         {
             InitializeComponent();
-            Common.JSE_URL = "https://clientportal.jse.co.za/downloadable-files?RequestNode=/YieldX/Derivatives/Docs_DMTM";
+            Common.ResourcesLink = "https://clientportal.jse.co.za/downloadable-files?RequestNode=/YieldX/Derivatives/Docs_DMTM";
+            Common.JSE_URL = "https://clientportal.jse.co.za";
         }
 
         private void btnDownload_Click(object sender, EventArgs e)
         {
-
-            CrawlWeb();
-            
+            ScrapeWeb();
         }
 
-        private static void CrawlWeb() 
+        private static void ScrapeWeb() 
         {
-            #region Download Excel Links for 2022
-            HtmlWeb htmlWeb = new HtmlWeb();
+            Common.CreateORCheckLocalFolders();
 
-            var htmlDoc = htmlWeb.Load(Common.JSE_URL);
-
-            foreach (var node in htmlDoc.DocumentNode.SelectNodes("//a[@class='inline']"))
+            #region Retrieve/Download Excel Files for 2022
+            try
             {
-                //var test = JsonConvert.SerializeObject(node.InnerText + "\n");
-                if (node.InnerText != "Parent")
+                HtmlWeb htmlWeb = new HtmlWeb();
+
+                var htmlDoc = htmlWeb.Load(Common.ResourcesLink);
+
+                foreach (var node in htmlDoc.DocumentNode.SelectNodes("//a[@class='inline']"))
                 {
-                    //Get Excel Links
-                    if (node.InnerText.Length > 4)
+                    if (node.InnerText != "Parent")
                     {
-                        //Appending Link
-                        Common.ExcelLinks2022 = new System.Collections.Generic.List<string>();
-                        Common.ExcelLinks2022.Add(node.InnerText);
+                        //Get Excel Links
+                        if (node.InnerText.Length > 4)
+                        {
+                            //Only store the Excel files
+                            if (node.InnerText.EndsWith(".xls")) 
+                            {
+                                //Appending Link
+                                HtmlAttribute attr = node.Attributes["href"];
+                                
+                                string path = $@"C:\Daily_MTM_Report_Sheets_2022\{node.InnerText}";
+                                if (!File.Exists(path))
+                                {
+                                   WebClient webClient = new WebClient();
+                                   webClient.Headers.Add("Content-Type", "application/vnd.ms-excel");
+                                   string downloadURL = Common.JSE_URL + attr.Value;
+                                   webClient.DownloadFile(downloadURL, path);
+                                }
+                                //ThreadPool.QueueUserWorkItem(new WaitCallback(DownloadFiles(), new object[] { node.InnerText }));
+                            }
+                        }
                     }
                 }
             }
+            catch (Exception ex) 
+            {
+                MessageBox.Show(ex.Message,"Something has happened when retrieving the files",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }
             #endregion
 
-            #region Download Excel Links for 2021
-            HtmlWeb additionalWeb = new HtmlWeb();
-
-            var additionalWebDoc = additionalWeb.Load(Common.JSE_URL + "/" + "2021");
-
-            foreach (var node in additionalWebDoc.DocumentNode.SelectNodes("//a[@class='inline']"))
+            #region Retrieve/Download Excel Files for 2021
+            try
             {
-                if (node.InnerText != "Parent")
+                HtmlWeb additionalWeb = new HtmlWeb();
+
+                var additionalWebDoc = additionalWeb.Load(Common.ResourcesLink + "/" + "2021");
+
+                foreach (var node in additionalWebDoc.DocumentNode.SelectNodes("//a[@class='inline']"))
                 {
-                    //Get Excel Links
-                    if (node.InnerText.Length > 4)
+                    if (node.InnerText != "Parent")
                     {
-                        //Appending Link
-                        Common.ExcelLinks2021 = new System.Collections.Generic.List<string>();
-                        Common.ExcelLinks2021.Add(node.InnerText);
+                        //Get Excel Links
+                        if (node.InnerText.Length > 4)
+                        {
+                            //Only store the Excel files
+                            if (node.InnerText.EndsWith(".xls"))
+                            {
+                                //Appending Link
+                                HtmlAttribute attr = node.Attributes["href"];
+
+                                string path = $@"C:\Daily_MTM_Report_Sheets_2021\{node.InnerText}";
+                                if (!File.Exists(path))
+                                {
+                                    WebClient webClient = new WebClient();
+                                    webClient.Headers.Add("Content-Type", "application/vnd.ms-excel");
+                                    string downloadURL = Common.JSE_URL + attr.Value;
+                                    webClient.DownloadFile(downloadURL, path);
+                                }
+                            }
+                        }
                     }
                 }
+            }
+            catch (Exception ex) 
+            {
+                MessageBox.Show(ex.Message, "Something has happened when retrieving the files", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             #endregion
         }
-
-        //private static 
     }
 }
