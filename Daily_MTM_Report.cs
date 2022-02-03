@@ -4,6 +4,7 @@ using HtmlAgilityPack;
 using System.IO;
 using System.Net;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace Daily_MTM_Report_Task_1
 {
@@ -19,6 +20,7 @@ namespace Daily_MTM_Report_Task_1
 
         private void btnDownload_Click(object sender, EventArgs e)
         {
+            //ThreadPool.QueueUserWorkItem(new WaitCallback())
             ScrapeWeb();
         }
 
@@ -54,6 +56,8 @@ namespace Daily_MTM_Report_Task_1
                                    string downloadURL = Common.JSE_URL + attr.Value;
                                    webClient.DownloadFile(downloadURL, path);
                                 }
+                                Common.ReadExcelData(path);
+                                //Common.ImportDataFromExcel(path);
                                 //ThreadPool.QueueUserWorkItem(new WaitCallback(DownloadFiles(), new object[] { node.InnerText }));
                             }
                         }
@@ -94,6 +98,7 @@ namespace Daily_MTM_Report_Task_1
                                     string downloadURL = Common.JSE_URL + attr.Value;
                                     webClient.DownloadFile(downloadURL, path);
                                 }
+                                Common.ReadExcelData(path);
                             }
                         }
                     }
