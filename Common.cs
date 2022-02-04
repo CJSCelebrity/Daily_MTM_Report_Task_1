@@ -90,7 +90,8 @@ namespace Daily_MTM_Report_Task_1
             float premiumOnOption = float.Parse(values[11].ToString() == "" ? "0" : values[11].ToString(), NumberStyles.Float, CultureInfo.CurrentCulture);
             float volatility = float.Parse(values[12].ToString(), NumberStyles.Float, CultureInfo.CurrentCulture);
             float delta = float.Parse(values[13].ToString(), NumberStyles.Float, CultureInfo.CurrentCulture);
-            float deltaValue = float.Parse(values[14].ToString(), NumberStyles.Float, CultureInfo.CurrentCulture);
+            string deltaValueConvert = values[14].ToString().Trim();
+            float deltaValue = float.Parse(deltaValueConvert);
             float contractsTraded = float.Parse(values[15].ToString(), NumberStyles.Float, CultureInfo.CurrentCulture);
             float openInterest = float.Parse(values[16].ToString(), NumberStyles.Float, CultureInfo.CurrentCulture);
 
