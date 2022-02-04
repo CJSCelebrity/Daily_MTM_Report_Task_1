@@ -56,16 +56,16 @@ namespace Daily_MTM_Report_Task_1
                 {
                 var rowName = ((DataRowView)m).Row.ItemArray[0].ToString();
 
-                if (rowName.Contains("DAILY SUMMARY")) {
-                    var removeText = "DAILY SUMMARY FOR:";
-                    string filedate = rowName.Remove(0,removeText.Length);
-                    excelFileDate = filedate.Trim();
-                }
+                    if (rowName.Contains("DAILY SUMMARY")) {
+                        var removeText = "DAILY SUMMARY FOR:";
+                        string filedate = rowName.Remove(0,removeText.Length);
+                        excelFileDate = filedate.Trim();
+                    }
 
-                if (!rowName.Contains("DAILY MTM REPORT") && !rowName.Contains("DAILY SUMMARY") && !rowName.Contains("Contract Details") && !rowName.Contains("Derivatives")) 
-                {
-                    SendToDB(((DataRowView)m).Row.ItemArray, excelFileDate);
-                }
+                    if (!rowName.Contains("DAILY MTM REPORT") && !rowName.Contains("DAILY SUMMARY") && !rowName.Contains("Contract Details") && !rowName.Contains("Derivatives")) 
+                    {
+                        SendToDB(((DataRowView)m).Row.ItemArray, excelFileDate);
+                    }
                 };
 
                 oledbConn.Close();
@@ -75,6 +75,7 @@ namespace Daily_MTM_Report_Task_1
         private static void SendToDB(object[] values, string excelfileDate) 
         {
             #region Process the data through to the DB
+            //Format data to its appropriate format
             DateTime fileDate = DateTime.Parse(excelfileDate);
             string contract = values[0].ToString();
             DateTime expiryDate = DateTime.Parse(values[2].ToString());
@@ -98,17 +99,38 @@ namespace Daily_MTM_Report_Task_1
 
             SqlConnection connection = new SqlConnection(@connectionString);
 
-            string query = $"INSERT INTO DailyMTM (FileDate,Contract,ExpiryDate,Classification,Strike,CallPut,MTMYield,MarkPrice,SpotRate,PreviousMTM,PreviousPrice,PremiumOnOption,Volatility,Delta,DeltaValue,ContractsTraded,OpenInterest) VALUES({fileDate},{contract},{expiryDate},{classification},{strike},{callPut},{mTMYield},{markPrice},{spotRate},{previousMTM},{previousPrice},{premiumOnOption},{volatility},{delta},{deltaValue},{contractsTraded},{openInterest})";
+            string query = "INSERT INTO DailyMTM (FileDate,Contract,ExpiryDate,Classification,Strike,CallPut,MTMYield,MarkPrice,SpotRate,PreviousMTM,PreviousPrice,PremiumOnOption,Volatility,Delta,DeltaValue,ContractsTraded,OpenInterest)";
 
-            SqlCommand command = new SqlCommand(query, connection);
+            query += "VALUES(@FileDate,@Contract,@ExpiryDate,@Classification,@Strike,@CallPut,@MTMYield,@MarkPrice,@SpotRate,@PreviousMTM,@PreviousPrice,@PremiumOnOption,@Volatility,@Delta,@DeltaValue,@ContractsTraded,@OpenInterest)";
+
             try
             {
-                connection.Open();
-                command.ExecuteNonQuery();
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    connection.Open();
+                    command.Parameters.AddWithValue("@FileDate", fileDate);
+                    command.Parameters.AddWithValue("@Contract", contract);
+                    command.Parameters.AddWithValue("@ExpiryDate", expiryDate);
+                    command.Parameters.AddWithValue("@Classification", classification);
+                    command.Parameters.AddWithValue("@Strike", strike);
+                    command.Parameters.AddWithValue("@CallPut", callPut);
+                    command.Parameters.AddWithValue("@MTMYield", mTMYield);
+                    command.Parameters.AddWithValue("@MarkPrice", markPrice);
+                    command.Parameters.AddWithValue("@SpotRate", spotRate);
+                    command.Parameters.AddWithValue("@PreviousMTM", previousMTM);
+                    command.Parameters.AddWithValue("@PreviousPrice", previousPrice);
+                    command.Parameters.AddWithValue("@PremiumOnOption", premiumOnOption);
+                    command.Parameters.AddWithValue("@Volatility", volatility);
+                    command.Parameters.AddWithValue("@Delta", delta);
+                    command.Parameters.AddWithValue("@DeltaValue", deltaValue);
+                    command.Parameters.AddWithValue("@ContractsTraded", contractsTraded);
+                    command.Parameters.AddWithValue("@OpenInterest", openInterest);
+                    command.ExecuteNonQuery();
+                }
             }
             catch (SqlException e)
             {
-                MessageBox.Show(e.Message, "Something has when processing the file to the database", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(e.Message, "Something has occured when processing the file to the database", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
             finally 
