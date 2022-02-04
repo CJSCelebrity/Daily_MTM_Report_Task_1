@@ -2,7 +2,7 @@
 
 Task 1 & Task 2 for Prescient Securities
 
-# Getting Started - (Task 1)
+##Getting Started
 
 -- Clone the project from Github into a your folder of choice
 
