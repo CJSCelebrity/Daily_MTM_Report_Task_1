@@ -2,7 +2,7 @@
 
 Task 1 & Task 2 for Prescient Securities
 
-# Getting Started
+# Getting Started - (Task 1)
 
 -- Clone the project from Github into a your folder of choice
 
@@ -12,3 +12,6 @@ Task 1 & Task 2 for Prescient Securities
    This will load the necessary packages into the project.
 
 -- Once the build has succeeded, press F5 on your keyboard or click on the green play button to start the application
+
+**N.B**
+-- The file listed _Stored Procedure for Total_Contracts_Traded_Report(DailyMTM)_ is a SQL file that once opened should allow you to run the stored procedure within SSMS.
